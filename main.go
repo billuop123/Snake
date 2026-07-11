@@ -4,13 +4,6 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-type coord int
-
-const (
-	X coord = iota
-	Y
-)
-
 type Snake struct {
 	X float32
 	Y float32
@@ -30,7 +23,7 @@ func main() {
 	gridW := boxH / gridNum
 	_ = gridW
 	head := Snake{
-		X: 2,
+		X: 1,
 		Y: 0,
 	}
 	second := Snake{
@@ -41,7 +34,7 @@ func main() {
 	s[0] = head
 	s[1] = second
 	dir := "D"
-	var speed float32 = 0.5
+	var speed float32 = 1
 	var gridTimer float32 = 0
 	var moveInterval float32 = 0.15
 	for !rl.WindowShouldClose() {
@@ -57,6 +50,8 @@ func main() {
 			dir = "D"
 		case rl.KeyA:
 			dir = "A"
+		case rl.KeyZ:
+			s = append(s, head)
 		}
 		gridTimer += rl.GetFrameTime()
 		if gridTimer > moveInterval {
@@ -71,8 +66,8 @@ func main() {
 			case "A":
 				newHead.X -= speed
 			}
-			s[0] = newHead
-			s[1] = head
+			s = append([]Snake{newHead}, s...)
+			s = s[:len(s)-1]
 			head = newHead
 			gridTimer = 0
 		}
