@@ -1,6 +1,8 @@
 package main
 
 import (
+	"math/rand"
+
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -34,22 +36,37 @@ func main() {
 	s[0] = head
 	s[1] = second
 	dir := "D"
-	var speed float32 = 1
+	var speed float32 = 0.5
 	var gridTimer float32 = 0
 	var moveInterval float32 = 0.15
+	xRand := 9
+	yRand := 9
 	for !rl.WindowShouldClose() {
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.RayWhite)
 		drawBox(padX, padY, boxW, boxH)
+		rl.DrawRectangle(int32(float32(padX)+float32(xRand)*float32(gridW)),
+			int32(float32(padY)+float32(yRand)*float32(gridW)),
+			gridW/2,
+			gridW/2,
+			rl.Yellow)
 		switch rl.GetKeyPressed() {
 		case rl.KeyS:
-			dir = "S"
+			if dir != "W" {
+				dir = "S"
+			}
 		case rl.KeyW:
-			dir = "W"
+			if dir != "S" {
+				dir = "W"
+			}
 		case rl.KeyD:
-			dir = "D"
+			if dir != "A" {
+				dir = "D"
+			}
 		case rl.KeyA:
-			dir = "A"
+			if dir != "D" {
+				dir = "A"
+			}
 		case rl.KeyZ:
 			s = append(s, head)
 		}
@@ -78,6 +95,13 @@ func main() {
 					gridW,
 					gridW,
 					rl.Red)
+			}
+			if (s[i].X*float32(gridW) <= float32(xRand)*float32(gridW)) &&
+				s[i].X*float32(gridW)+float32(gridW) >= float32(xRand)*float32(gridW)+float32(gridW/2) &&
+				s[i].Y*float32(gridW) <= float32(yRand)*float32(gridW) &&
+				s[i].Y*float32(gridW)+float32(gridW) >= float32(yRand)*float32(gridW)+float32(gridW/2) {
+				xRand = rand.Intn(10)
+				yRand = rand.Intn(10)
 			}
 		}
 		rl.EndDrawing()
