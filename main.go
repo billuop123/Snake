@@ -54,45 +54,10 @@ func main() {
 			gridW/2,
 			rl.Yellow)
 		if gameOver {
-			rl.DrawText("Game is over", 50, 10, 25, rl.Black)
-			rl.DrawRectangle(600, 10, 175, 30, rl.Black)
-			rl.DrawText("press n", 630, 14, 25, rl.LightGray)
+			gameOverContent()
 		}
 		rl.DrawText(strconv.Itoa(score), 400, 10, 25, rl.Green)
-		switch rl.GetKeyPressed() {
-		case rl.KeyS:
-			if dir != "W" {
-				dir = "S"
-			}
-		case rl.KeyW:
-			if dir != "S" {
-				dir = "W"
-			}
-		case rl.KeyD:
-			if dir != "A" {
-				dir = "D"
-			}
-		case rl.KeyA:
-			if dir != "D" {
-				dir = "A"
-			}
-		case rl.KeyN:
-			s = make([]Snake, 2)
-			head = Snake{
-				X: 2,
-				Y: 0,
-			}
-			second = Snake{
-				X: 1,
-				Y: 0,
-			}
-			dir = "D"
-			s[0] = head
-			s[1] = second
-			speed = 0.5
-			gridTimer = 0
-			gameOver = false
-		}
+		handleKeyEvents(&dir, &head, &second, s, &speed, &gridTimer, &gameOver)
 		gridTimer += rl.GetFrameTime()
 		if gridTimer > moveInterval {
 			newHead := s[0]
@@ -107,7 +72,6 @@ func main() {
 				newHead.X -= speed
 			}
 			if checkSelfCollision(newHead, s) || checkBoundary(newHead) {
-				// s = append([]Snake{newHead}, s...)
 				speed = 0
 				gameOver = true
 			} else {
@@ -158,4 +122,47 @@ func checkBoundary(newHead Snake) bool {
 		return true
 	}
 	return false
+}
+
+func gameOverContent() {
+	rl.DrawText("Game is over", 50, 10, 25, rl.Black)
+	rl.DrawRectangle(600, 10, 175, 30, rl.Black)
+	rl.DrawText("press n", 630, 14, 25, rl.LightGray)
+}
+
+func handleKeyEvents(dir *string, head *Snake, second *Snake, s []Snake, speed *float32, gridTimer *float32, gameOver *bool) {
+	switch rl.GetKeyPressed() {
+	case rl.KeyS:
+		if *dir != "W" {
+			*dir = "S"
+		}
+	case rl.KeyW:
+		if *dir != "S" {
+			*dir = "W"
+		}
+	case rl.KeyD:
+		if *dir != "A" {
+			*dir = "D"
+		}
+	case rl.KeyA:
+		if *dir != "D" {
+			*dir = "A"
+		}
+	case rl.KeyN:
+		s = make([]Snake, 2)
+		*head = Snake{
+			X: 2,
+			Y: 0,
+		}
+		*second = Snake{
+			X: 1,
+			Y: 0,
+		}
+		*dir = "D"
+		s[0] = *head
+		s[1] = *second
+		*speed = 0.5
+		*gridTimer = 0
+		*gameOver = false
+	}
 }
