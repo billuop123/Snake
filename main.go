@@ -25,7 +25,7 @@ func main() {
 	gridW := boxH / gridNum
 	_ = gridW
 	head := Snake{
-		X: 1,
+		X: 2,
 		Y: 0,
 	}
 	second := Snake{
@@ -36,7 +36,7 @@ func main() {
 	s[0] = head
 	s[1] = second
 	dir := "D"
-	var speed float32 = 0.1
+	var speed float32 = 0.5
 	var gridTimer float32 = 0
 	var moveInterval float32 = 0.15
 	xRand := rand.Intn(10)
@@ -81,10 +81,14 @@ func main() {
 			case "A":
 				newHead.X -= speed
 			}
-			s = append([]Snake{newHead}, s...)
-			s = s[:len(s)-1]
-			head = newHead
 			gridTimer = 0
+			if checkSelfCollision(newHead, s) || checkBoundary(newHead) {
+				speed = 0
+			} else {
+				s = append([]Snake{newHead}, s...)
+				s = s[:len(s)-1]
+				head = newHead
+			}
 		}
 		for i := range s {
 			if s[i].X != 0 || s[i].Y != 0 {
@@ -102,7 +106,7 @@ func main() {
 				yRand = rand.Intn(10)
 				s = append(s, head)
 				if speed < 1 {
-					speed += 0.0125
+					speed += 0.5
 				}
 			}
 		}
@@ -112,4 +116,20 @@ func main() {
 
 func drawBox(padX, padY, boxW, boxH int32) {
 	rl.DrawRectangle(padX, padY, boxW, boxH, rl.LightGray)
+}
+
+func checkSelfCollision(newHead Snake, s []Snake) bool {
+	for i := 1; i < len(s); i++ {
+		if newHead.X == s[i].X && newHead.Y == s[i].Y {
+			return true
+		}
+	}
+	return false
+}
+
+func checkBoundary(newHead Snake) bool {
+	if newHead.X < 0 || newHead.Y < 0 || newHead.X >= 9.5 || newHead.Y >= 9.5 {
+		return true
+	}
+	return false
 }
