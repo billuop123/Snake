@@ -36,11 +36,11 @@ func main() {
 	s[0] = head
 	s[1] = second
 	dir := "D"
-	var speed float32 = 0.5
+	var speed float32 = 0.1
 	var gridTimer float32 = 0
 	var moveInterval float32 = 0.15
-	xRand := 9
-	yRand := 9
+	xRand := rand.Intn(10)
+	yRand := rand.Intn(10)
 	for !rl.WindowShouldClose() {
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.RayWhite)
@@ -67,8 +67,6 @@ func main() {
 			if dir != "D" {
 				dir = "A"
 			}
-		case rl.KeyZ:
-			s = append(s, head)
 		}
 		gridTimer += rl.GetFrameTime()
 		if gridTimer > moveInterval {
@@ -96,12 +94,16 @@ func main() {
 					gridW,
 					rl.Red)
 			}
-			if (s[i].X*float32(gridW) <= float32(xRand)*float32(gridW)) &&
-				s[i].X*float32(gridW)+float32(gridW) >= float32(xRand)*float32(gridW)+float32(gridW/2) &&
-				s[i].Y*float32(gridW) <= float32(yRand)*float32(gridW) &&
-				s[i].Y*float32(gridW)+float32(gridW) >= float32(yRand)*float32(gridW)+float32(gridW/2) {
+			if (s[0].X*float32(gridW) <= float32(xRand)*float32(gridW)) &&
+				s[0].X*float32(gridW)+float32(gridW) >= float32(xRand)*float32(gridW)+float32(gridW/2) &&
+				s[0].Y*float32(gridW) <= float32(yRand)*float32(gridW) &&
+				s[0].Y*float32(gridW)+float32(gridW) >= float32(yRand)*float32(gridW)+float32(gridW/2) {
 				xRand = rand.Intn(10)
 				yRand = rand.Intn(10)
+				s = append(s, head)
+				if speed < 1 {
+					speed += 0.0125
+				}
 			}
 		}
 		rl.EndDrawing()
