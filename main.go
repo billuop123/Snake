@@ -2,6 +2,7 @@ package main
 
 import (
 	"math/rand"
+	"strconv"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -39,8 +40,10 @@ func main() {
 	var speed float32 = 0.5
 	var gridTimer float32 = 0
 	var moveInterval float32 = 0.15
-	xRand := rand.Intn(10)
-	yRand := rand.Intn(10)
+	xRand := rand.Intn(8) + 1
+	yRand := rand.Intn(8) + 1
+	gameOver := false
+	score := 0
 	for !rl.WindowShouldClose() {
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.RayWhite)
@@ -50,6 +53,12 @@ func main() {
 			gridW/2,
 			gridW/2,
 			rl.Yellow)
+		if gameOver {
+			rl.DrawText("Game is over", 50, 10, 25, rl.Black)
+			rl.DrawRectangle(600, 10, 175, 30, rl.Black)
+			rl.DrawText("press n", 630, 14, 25, rl.LightGray)
+		}
+		rl.DrawText(strconv.Itoa(score), 400, 10, 25, rl.Green)
 		switch rl.GetKeyPressed() {
 		case rl.KeyS:
 			if dir != "W" {
@@ -67,6 +76,22 @@ func main() {
 			if dir != "D" {
 				dir = "A"
 			}
+		case rl.KeyN:
+			s = make([]Snake, 2)
+			head = Snake{
+				X: 2,
+				Y: 0,
+			}
+			second = Snake{
+				X: 1,
+				Y: 0,
+			}
+			dir = "D"
+			s[0] = head
+			s[1] = second
+			speed = 0.5
+			gridTimer = 0
+			gameOver = false
 		}
 		gridTimer += rl.GetFrameTime()
 		if gridTimer > moveInterval {
@@ -81,34 +106,35 @@ func main() {
 			case "A":
 				newHead.X -= speed
 			}
-			gridTimer = 0
 			if checkSelfCollision(newHead, s) || checkBoundary(newHead) {
+				// s = append([]Snake{newHead}, s...)
 				speed = 0
+				gameOver = true
 			} else {
 				s = append([]Snake{newHead}, s...)
 				s = s[:len(s)-1]
 				head = newHead
 			}
+			gridTimer = 0
 		}
 		for i := range s {
-			if s[i].X != 0 || s[i].Y != 0 {
-				rl.DrawRectangle(int32(float32(padX)+s[i].X*float32(gridW)),
-					int32(float32(padY)+s[i].Y*float32(gridW)),
-					gridW,
-					gridW,
-					rl.Red)
+			rl.DrawRectangle(int32(float32(padX)+s[i].X*float32(gridW)),
+				int32(float32(padY)+s[i].Y*float32(gridW)),
+				gridW,
+				gridW,
+				rl.Red)
+		}
+		if (s[0].X*float32(gridW) <= float32(xRand)*float32(gridW)) &&
+			s[0].X*float32(gridW)+float32(gridW) >= float32(xRand)*float32(gridW)+float32(gridW/2) &&
+			s[0].Y*float32(gridW) <= float32(yRand)*float32(gridW) &&
+			s[0].Y*float32(gridW)+float32(gridW) >= float32(yRand)*float32(gridW)+float32(gridW/2) {
+			xRand = rand.Intn(8) + 1
+			yRand = rand.Intn(8) + 1
+			s = append(s, head)
+			if speed < 1 {
+				speed += 0.25
 			}
-			if (s[0].X*float32(gridW) <= float32(xRand)*float32(gridW)) &&
-				s[0].X*float32(gridW)+float32(gridW) >= float32(xRand)*float32(gridW)+float32(gridW/2) &&
-				s[0].Y*float32(gridW) <= float32(yRand)*float32(gridW) &&
-				s[0].Y*float32(gridW)+float32(gridW) >= float32(yRand)*float32(gridW)+float32(gridW/2) {
-				xRand = rand.Intn(10)
-				yRand = rand.Intn(10)
-				s = append(s, head)
-				if speed < 1 {
-					speed += 0.5
-				}
-			}
+			score++
 		}
 		rl.EndDrawing()
 	}
