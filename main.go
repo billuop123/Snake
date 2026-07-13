@@ -24,7 +24,6 @@ func main() {
 	boxH := boxW
 	var gridNum int32 = 10
 	gridW := boxH / gridNum
-	_ = gridW
 	head := Snake{
 		X: 2,
 		Y: 0,
@@ -40,8 +39,8 @@ func main() {
 	var speed float32 = 0.5
 	var gridTimer float32 = 0
 	var moveInterval float32 = 0.15
-	xRand := rand.Intn(8) + 1
-	yRand := rand.Intn(8) + 1
+	xRand := rand.Intn(int(gridNum-2)) + 1
+	yRand := rand.Intn(int(gridNum-2)) + 1
 	gameOver := false
 	score := 0
 	for !rl.WindowShouldClose() {
@@ -71,21 +70,21 @@ func main() {
 			case "A":
 				newHead.X -= speed
 			}
-			if checkSelfCollision(newHead, s) || checkBoundary(newHead) {
+			if checkSelfCollision(newHead, s) || checkBoundary(newHead, gridNum) {
 				speed = 0
 				gameOver = true
-				if checkBoundary(newHead) {
+				if checkBoundary(newHead, gridNum) {
 					if newHead.X < 0 {
 						newHead.X = 0
-					} else if newHead.X > 9 {
-						newHead.X = 9
+					} else if newHead.X > float32(gridNum-1) {
+						newHead.X = float32(gridNum - 1)
 					} else if newHead.Y < 0 {
 						newHead.Y = 0
 					} else {
-						newHead.Y = 9
+						newHead.Y = float32(gridNum - 1)
 					}
-					s = append([]Snake{newHead}, s...)
 				}
+				s = append([]Snake{newHead}, s...)
 			} else {
 				s = append([]Snake{newHead}, s...)
 				s = s[:len(s)-1]
@@ -104,8 +103,8 @@ func main() {
 			s[0].X*float32(gridW)+float32(gridW) >= float32(xRand)*float32(gridW)+float32(gridW/2) &&
 			s[0].Y*float32(gridW) <= float32(yRand)*float32(gridW) &&
 			s[0].Y*float32(gridW)+float32(gridW) >= float32(yRand)*float32(gridW)+float32(gridW/2) {
-			xRand = rand.Intn(8) + 1
-			yRand = rand.Intn(8) + 1
+			xRand = rand.Intn(int(gridNum-2)) + 1
+			yRand = rand.Intn(int(gridNum-2)) + 1
 			s = append(s, head)
 			if speed < 1 {
 				speed += 0.25
@@ -129,17 +128,26 @@ func checkSelfCollision(newHead Snake, s []Snake) bool {
 	return false
 }
 
-func checkBoundary(newHead Snake) bool {
-	if newHead.X < 0 || newHead.Y < 0 || newHead.X > 9 || newHead.Y > 9 {
+func checkBoundary(newHead Snake, gridNum int32) bool {
+	if newHead.X < 0 || newHead.Y < 0 || newHead.X > float32(gridNum-1) || newHead.Y > float32(gridNum-1) {
 		return true
 	}
 	return false
 }
 
 func gameOverContent() {
-	rl.DrawText("Game is over", 50, 10, 25, rl.Black)
-	rl.DrawRectangle(600, 10, 175, 30, rl.Black)
-	rl.DrawText("press n", 630, 14, 25, rl.LightGray)
+	var textX int32 = 50
+	var textY int32 = 10
+	var rectX int32 = 600
+	var rectY int32 = 175
+	var rectW int32 = 175
+	var rectH int32 = 30
+	var textFont int32 = 25
+	var posX int32 = 630
+	var posY int32 = 14
+	rl.DrawText("Game is over", textX, textY, textFont, rl.Black)
+	rl.DrawRectangle(rectX, rectY, rectW, rectH, rl.Black)
+	rl.DrawText("press n", posX, posY, textFont, rl.LightGray)
 }
 
 func handleKeyEvents(dir *string, head *Snake, second *Snake, s *[]Snake, speed *float32, gridTimer *float32, gameOver *bool) {
