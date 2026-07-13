@@ -57,7 +57,7 @@ func main() {
 			gameOverContent()
 		}
 		rl.DrawText(strconv.Itoa(score), 400, 10, 25, rl.Green)
-		handleKeyEvents(&dir, &head, &second, s, &speed, &gridTimer, &gameOver)
+		handleKeyEvents(&dir, &head, &second, &s, &speed, &gridTimer, &gameOver)
 		gridTimer += rl.GetFrameTime()
 		if gridTimer > moveInterval {
 			newHead := s[0]
@@ -74,6 +74,18 @@ func main() {
 			if checkSelfCollision(newHead, s) || checkBoundary(newHead) {
 				speed = 0
 				gameOver = true
+				if checkBoundary(newHead) {
+					if newHead.X < 0 {
+						newHead.X = 0
+					} else if newHead.X > 9 {
+						newHead.X = 9
+					} else if newHead.Y < 0 {
+						newHead.Y = 0
+					} else {
+						newHead.Y = 9
+					}
+					s = append([]Snake{newHead}, s...)
+				}
 			} else {
 				s = append([]Snake{newHead}, s...)
 				s = s[:len(s)-1]
@@ -118,7 +130,7 @@ func checkSelfCollision(newHead Snake, s []Snake) bool {
 }
 
 func checkBoundary(newHead Snake) bool {
-	if newHead.X < 0 || newHead.Y < 0 || newHead.X >= 9.5 || newHead.Y >= 9.5 {
+	if newHead.X < 0 || newHead.Y < 0 || newHead.X > 9 || newHead.Y > 9 {
 		return true
 	}
 	return false
@@ -130,7 +142,7 @@ func gameOverContent() {
 	rl.DrawText("press n", 630, 14, 25, rl.LightGray)
 }
 
-func handleKeyEvents(dir *string, head *Snake, second *Snake, s []Snake, speed *float32, gridTimer *float32, gameOver *bool) {
+func handleKeyEvents(dir *string, head *Snake, second *Snake, s *[]Snake, speed *float32, gridTimer *float32, gameOver *bool) {
 	switch rl.GetKeyPressed() {
 	case rl.KeyS:
 		if *dir != "W" {
@@ -149,7 +161,7 @@ func handleKeyEvents(dir *string, head *Snake, second *Snake, s []Snake, speed *
 			*dir = "A"
 		}
 	case rl.KeyN:
-		s = make([]Snake, 2)
+		*s = make([]Snake, 2)
 		*head = Snake{
 			X: 2,
 			Y: 0,
@@ -159,8 +171,8 @@ func handleKeyEvents(dir *string, head *Snake, second *Snake, s []Snake, speed *
 			Y: 0,
 		}
 		*dir = "D"
-		s[0] = *head
-		s[1] = *second
+		(*s)[0] = *head
+		(*s)[1] = *second
 		*speed = 0.5
 		*gridTimer = 0
 		*gameOver = false
