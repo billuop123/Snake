@@ -12,6 +12,13 @@ type Snake struct {
 	Y float32
 }
 
+const (
+	dirRight string = "D"
+	dirLeft  string = "A"
+	dirUp    string = "W"
+	dirDown  string = "S"
+)
+
 func main() {
 	var width int32 = 800
 	var height int32 = 800
@@ -22,7 +29,7 @@ func main() {
 	var padY int32 = 30
 	boxW := width - 2*padX
 	boxH := boxW
-	var gridNum int32 = 10
+	var gridNum int32 = 30
 	gridW := boxH / gridNum
 	head := Snake{
 		X: 2,
@@ -35,7 +42,7 @@ func main() {
 	s := make([]Snake, 2)
 	s[0] = head
 	s[1] = second
-	dir := "D"
+	dir := dirRight
 	var speed float32 = 0.5
 	var gridTimer float32 = 0
 	var moveInterval float32 = 0.15
@@ -164,20 +171,20 @@ func gameOverContent() {
 func handleKeyEvents(dir *string, score *int, head *Snake, second *Snake, s *[]Snake, speed *float32, gridTimer *float32, gameOver *bool) {
 	switch rl.GetKeyPressed() {
 	case rl.KeyS:
-		if *dir != "W" {
-			*dir = "S"
+		if *dir != dirUp {
+			*dir = dirDown
 		}
 	case rl.KeyW:
-		if *dir != "S" {
-			*dir = "W"
+		if *dir != dirDown {
+			*dir = dirUp
 		}
 	case rl.KeyD:
-		if *dir != "A" {
-			*dir = "D"
+		if *dir != dirLeft {
+			*dir = dirRight
 		}
 	case rl.KeyA:
-		if *dir != "D" {
-			*dir = "A"
+		if *dir != dirRight {
+			*dir = dirLeft
 		}
 	case rl.KeyN:
 		*s = make([]Snake, 2)
@@ -189,7 +196,7 @@ func handleKeyEvents(dir *string, score *int, head *Snake, second *Snake, s *[]S
 			X: 1,
 			Y: 0,
 		}
-		*dir = "D"
+		*dir = dirRight
 		(*s)[0] = *head
 		(*s)[1] = *second
 		*speed = 0.5
@@ -208,16 +215,16 @@ func handleLoop(headOrTail rl.Texture2D, dir string, gridW int32, s []Snake, pad
 		dir = getTailDirection(s)
 	}
 	switch dir {
-	case "A":
+	case dirLeft:
 		rotation = 0
 		offsetX += float32(gridW)
 		offsetY += float32(gridW)
-	case "D":
+	case dirRight:
 		rotation = 180
-	case "W":
+	case dirUp:
 		offsetY += float32(gridW)
 		rotation = 90
-	case "S":
+	case dirDown:
 		offsetX += float32(gridW)
 		offsetY -= 2
 		rotation = -90
@@ -244,13 +251,13 @@ func getTailDirection(s []Snake) string {
 	prev := s[n-2]
 	switch {
 	case prev.X < tail.X:
-		return "A"
+		return dirLeft
 	case prev.X > tail.X:
-		return "D"
+		return dirRight
 	case prev.Y > tail.Y:
-		return "S"
+		return dirDown
 	case prev.Y < tail.Y:
-		return "W"
+		return dirUp
 	}
-	return "D"
+	return dirRight
 }
