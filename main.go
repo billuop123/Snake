@@ -43,6 +43,8 @@ func main() {
 	yRand := rand.Intn(int(gridNum-2)) + 1
 	gameOver := false
 	score := 0
+	headRight := rl.LoadTexture("./headLeft.png")
+	tail := rl.LoadTexture("./tail.png")
 	for !rl.WindowShouldClose() {
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.RayWhite)
@@ -55,8 +57,9 @@ func main() {
 		if gameOver {
 			gameOverContent()
 		}
+		rl.DrawText(dir, 10, 40, 20, rl.Black)
 		rl.DrawText(strconv.Itoa(score), 400, 10, 25, rl.Green)
-		handleKeyEvents(&dir, &head, &second, &s, &speed, &gridTimer, &gameOver)
+		handleKeyEvents(&dir, &score, &head, &second, &s, &speed, &gridTimer, &gameOver)
 		gridTimer += rl.GetFrameTime()
 		if gridTimer > moveInterval {
 			newHead := s[0]
@@ -93,6 +96,13 @@ func main() {
 			gridTimer = 0
 		}
 		for i := range s {
+			if i == 0 {
+				handleLoop(headRight, dir, gridW, s, padX, padY, i, "head")
+				continue
+			} else if i == len(s)-1 {
+				handleLoop(tail, dir, gridW, s, padX, padY, i, "tail")
+				continue
+			}
 			rl.DrawRectangle(int32(float32(padX)+s[i].X*float32(gridW)),
 				int32(float32(padY)+s[i].Y*float32(gridW)),
 				gridW,
@@ -116,7 +126,8 @@ func main() {
 }
 
 func drawBox(padX, padY, boxW, boxH int32) {
-	rl.DrawRectangle(padX, padY, boxW, boxH, rl.LightGray)
+	green := rl.Color{R: 144, G: 238, B: 144, A: 255}
+	rl.DrawRectangle(padX, padY, boxW, boxH, green)
 }
 
 func checkSelfCollision(newHead Snake, s []Snake) bool {
@@ -139,7 +150,7 @@ func gameOverContent() {
 	var textX int32 = 50
 	var textY int32 = 10
 	var rectX int32 = 600
-	var rectY int32 = 175
+	var rectY int32 = 10
 	var rectW int32 = 175
 	var rectH int32 = 30
 	var textFont int32 = 25
@@ -150,7 +161,7 @@ func gameOverContent() {
 	rl.DrawText("press n", posX, posY, textFont, rl.LightGray)
 }
 
-func handleKeyEvents(dir *string, head *Snake, second *Snake, s *[]Snake, speed *float32, gridTimer *float32, gameOver *bool) {
+func handleKeyEvents(dir *string, score *int, head *Snake, second *Snake, s *[]Snake, speed *float32, gridTimer *float32, gameOver *bool) {
 	switch rl.GetKeyPressed() {
 	case rl.KeyS:
 		if *dir != "W" {
@@ -184,5 +195,62 @@ func handleKeyEvents(dir *string, head *Snake, second *Snake, s *[]Snake, speed 
 		*speed = 0.5
 		*gridTimer = 0
 		*gameOver = false
+		*score = 0
 	}
+}
+
+func handleLoop(headOrTail rl.Texture2D, dir string, gridW int32, s []Snake, padX, padY int32, i int, somename string) {
+	tailDir := headOrTail
+	var rotation float32 = 0
+	var offsetX float32 = 0
+	var offsetY float32 = 0
+	if somename == "tail" {
+		dir = getTailDirection(s)
+	}
+	switch dir {
+	case "A":
+		rotation = 0
+		offsetX += float32(gridW)
+		offsetY += float32(gridW)
+	case "D":
+		rotation = 180
+	case "W":
+		offsetY += float32(gridW)
+		rotation = 90
+	case "S":
+		offsetX += float32(gridW)
+		offsetY -= 2
+		rotation = -90
+	}
+	srcRec := rl.Rectangle{
+		X:      0,
+		Y:      0,
+		Height: float32(tailDir.Height),
+		Width:  float32(tailDir.Width),
+	}
+	destRec := rl.Rectangle{
+		X:      float32(padX) + s[i].X*float32(gridW) + float32(offsetX),
+		Y:      float32(padY) + s[i].Y*float32(gridW) + float32(offsetY),
+		Width:  float32(gridW),
+		Height: float32(gridW),
+	}
+	origin := rl.Vector2{X: destRec.Width, Y: destRec.Height}
+	rl.DrawTexturePro(tailDir, srcRec, destRec, origin, rotation, rl.White)
+}
+
+func getTailDirection(s []Snake) string {
+	n := len(s)
+	tail := s[n-1]
+	prev := s[n-2]
+	switch {
+	case prev.X < tail.X:
+		return "A"
+	case prev.X > tail.X:
+		return "D"
+	case prev.Y > tail.Y:
+		return "S"
+	case prev.Y < tail.Y:
+		return "W"
+	}
+	return "D"
 }
