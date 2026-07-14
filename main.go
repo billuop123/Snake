@@ -50,6 +50,7 @@ func main() {
 	yRand := rand.Intn(int(gridNum-2)) + 1
 	gameOver := false
 	score := 0
+	const increment float32 = 0.25
 	headRight := rl.LoadTexture("./headLeft.png")
 	tail := rl.LoadTexture("./tail.png")
 	for !rl.WindowShouldClose() {
@@ -64,8 +65,7 @@ func main() {
 		if gameOver {
 			gameOverContent()
 		}
-		rl.DrawText(dir, 10, 40, 20, rl.Black)
-		rl.DrawText(strconv.Itoa(score), 400, 10, 25, rl.Green)
+		rl.DrawText(strconv.Itoa(score), 400, 10, 25, rl.Black)
 		handleKeyEvents(&dir, &score, &head, &second, &s, &speed, &gridTimer, &gameOver)
 		gridTimer += rl.GetFrameTime()
 		if gridTimer > moveInterval {
@@ -124,7 +124,7 @@ func main() {
 			yRand = rand.Intn(int(gridNum-2)) + 1
 			s = append(s, head)
 			if speed < 1 {
-				speed += 0.25
+				speed += increment
 			}
 			score++
 		}
