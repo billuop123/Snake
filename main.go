@@ -40,7 +40,7 @@ func main() {
 	dir := dirRight
 	var speed float32 = 0.5
 	var gridTimer float32 = 0
-	var moveInterval float32 = 0.15
+	const moveInterval float32 = 0.15
 	xRand := rand.Intn(int(gridNum-2)) + 1
 	yRand := rand.Intn(int(gridNum-2)) + 1
 	gameOver := false
@@ -79,13 +79,14 @@ func main() {
 				speed = 0
 				gameOver = true
 				if checkBoundary(newHead, gridNum) {
-					if newHead.X < 0 {
+					switch {
+					case newHead.X < 0:
 						newHead.X = 0
-					} else if newHead.X > float32(gridNum-1) {
+					case newHead.X > float32(gridNum-1):
 						newHead.X = float32(gridNum - 1)
-					} else if newHead.Y < 0 {
+					case newHead.Y < 0:
 						newHead.Y = 0
-					} else {
+					default:
 						newHead.Y = float32(gridNum - 1)
 					}
 				}
