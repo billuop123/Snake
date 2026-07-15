@@ -35,13 +35,8 @@ func main() {
 		X: 2,
 		Y: 0,
 	}
-	second := Snake{
-		X: 1,
-		Y: 0,
-	}
 	s := make([]Snake, 2)
 	s[0] = head
-	s[1] = second
 	dir := dirRight
 	var speed float32 = 0.5
 	var gridTimer float32 = 0
@@ -66,18 +61,18 @@ func main() {
 			gameOverContent()
 		}
 		rl.DrawText(strconv.Itoa(score), 400, 10, 25, rl.Black)
-		handleKeyEvents(&dir, &score, &head, &second, &s, &speed, &gridTimer, &gameOver)
+		handleKeyEvents(&dir, &score, &head, &s, &speed, &gridTimer, &gameOver)
 		gridTimer += rl.GetFrameTime()
 		if gridTimer > moveInterval {
 			newHead := s[0]
 			switch dir {
-			case "S":
+			case dirDown:
 				newHead.Y += speed
-			case "W":
+			case dirUp:
 				newHead.Y -= speed
-			case "D":
+			case dirRight:
 				newHead.X += speed
-			case "A":
+			case dirLeft:
 				newHead.X -= speed
 			}
 			if checkSelfCollision(newHead, s) || checkBoundary(newHead, gridNum) {
@@ -168,7 +163,7 @@ func gameOverContent() {
 	rl.DrawText("press n", posX, posY, textFont, rl.LightGray)
 }
 
-func handleKeyEvents(dir *string, score *int, head *Snake, second *Snake, s *[]Snake, speed *float32, gridTimer *float32, gameOver *bool) {
+func handleKeyEvents(dir *string, score *int, head *Snake, s *[]Snake, speed *float32, gridTimer *float32, gameOver *bool) {
 	switch rl.GetKeyPressed() {
 	case rl.KeyS:
 		if *dir != dirUp {
@@ -192,13 +187,13 @@ func handleKeyEvents(dir *string, score *int, head *Snake, second *Snake, s *[]S
 			X: 2,
 			Y: 0,
 		}
-		*second = Snake{
-			X: 1,
-			Y: 0,
-		}
+		// *second = Snake{
+		// 	X: 1,
+		// 	Y: 0,
+		// }
 		*dir = dirRight
 		(*s)[0] = *head
-		(*s)[1] = *second
+		// (*s)[1] = *second
 		*speed = 0.5
 		*gridTimer = 0
 		*gameOver = false
