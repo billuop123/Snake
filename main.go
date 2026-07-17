@@ -73,6 +73,8 @@ type scoreMetrics struct {
 func main() {
 	var width int32 = 800
 	var height int32 = 800
+	startingX := 2
+	startingY := 2
 	rl.InitWindow(width, height, "u are a snake")
 	defer rl.CloseWindow()
 	rl.SetTargetFPS(60)
@@ -83,8 +85,8 @@ func main() {
 	}
 	g.init(width)
 	head := Snake{
-		X: 2,
-		Y: 0,
+		X: float32(startingX),
+		Y: float32(startingY),
 	}
 	s := make([]Snake, 2)
 	s[0] = head
